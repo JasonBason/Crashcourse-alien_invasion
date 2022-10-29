@@ -4,7 +4,7 @@ from settings import Settings
 from ship import Ship
 
 import os
-os.chdir("C:/Users/jshih/mu_code/Code/Python_Crash_Course/Project-Alien_Invasion/Project-Alien_Invasion")
+os.chdir("C:/Users/Jason/Documents/python_code/Crashcourse-alien_invasion/Project-Alien_Invasion")
 print(f"current directory: {os.getcwd()}")
 
 class AlienInvasion:
