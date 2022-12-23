@@ -7,6 +7,8 @@ from alien import Alien
 from time import sleep
 from game_stats import GameStats
 from button import Button
+from scoreboard import Scoreboard
+
 
 import os
 os.chdir("C:/Users/jshih/mu_code/Code/Python_Crash_Course/Project-Alien_Invasion/Project-Alien_Invasion")
@@ -29,8 +31,9 @@ class AlienInvasion:
        #self.screen = pygame.display.set_mode((700,600))#(1280,720))
         pygame.display.set_caption("Alien Invasion")
     
-        # Create an instance to store game statistics.
+        # Create an instance to store game statistics and show score.
         self.stats = GameStats(self)
+        self.sb = Scoreboard(self)
     
         self.ship = Ship(self)
         
@@ -42,7 +45,8 @@ class AlienInvasion:
         
         # Make the play button
         self.play_button = Button(self, "Play")
-
+        print(f'self is {self}')
+    
     def run_game(self):
         """Start the main loop for the game."""
         while True:
@@ -54,6 +58,8 @@ class AlienInvasion:
                 self._update_aliens()
                 
             self._update_screen()
+
+            
     def _ship_hit(self):
         """Respond to the ship being hit by an alien"""
         if self.stats.ships_left >0:
@@ -112,6 +118,8 @@ class AlienInvasion:
         # reset game stats
         self.stats.reset_stats()
         self.stats.game_active = True
+        self.settings.initialize_dynamic_settings()
+        self.sb.prep_score()
                 
         self.bullets.empty()
         self.aliens.empty()
@@ -176,7 +184,20 @@ class AlienInvasion:
         collisions = pygame.sprite.groupcollide(
             self.bullets, self.aliens, True, True
         )
+        
+        if not self.aliens:
+            # Destroy existing bullets and create new fleet
+            self.bullets.empty()
+            self._create_fleet()
+            self.settings.increase_speed()
+            print('speed increasing! ')
         #sprint(len(self.aliens))
+        
+        if collisions:
+            number_aliens = [len(v) for v in collisions.values()]
+            self.stats.score+=(self.settings.alien_points * number_aliens[0])
+            self.sb.prep_score()
+            print(number_aliens)
    
     
     def _update_aliens(self):
@@ -250,13 +271,20 @@ class AlienInvasion:
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
+
+
         
         # Draw in the play button if the game is inactive
         if self.stats.game_active == False:
             self.play_button.draw_button()
+
+        # update score
+        self.sb.show_score()
         
         # Make the most recently drawn screen visible.
         pygame.display.flip()
+        
+
         
 
             
@@ -264,3 +292,5 @@ if __name__ == '__main__':
     # Make a game instance, and run the game.
     ai = AlienInvasion()
     ai.run_game()
+
+print(f'ai is {ai}')
