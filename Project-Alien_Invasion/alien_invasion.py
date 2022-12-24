@@ -77,6 +77,9 @@ class AlienInvasion:
             # Pause.
             sleep(0.5)
             
+            # update ship lives
+            self.sb.prep_ships()
+            
         else:
             self.stats.game_active = False
             pygame.mouse.set_visible(True)
@@ -120,6 +123,8 @@ class AlienInvasion:
         self.stats.game_active = True
         self.settings.initialize_dynamic_settings()
         self.sb.prep_score()
+        self.sb.prep_level()
+        self.sb.prep_ships()
                 
         self.bullets.empty()
         self.aliens.empty()
@@ -168,7 +173,6 @@ class AlienInvasion:
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <=0:
                 self.bullets.remove(bullet)
-        #print(len(self.bullets))
         
         self._check_bullet_alien_collisions() 
 
@@ -190,14 +194,16 @@ class AlienInvasion:
             self.bullets.empty()
             self._create_fleet()
             self.settings.increase_speed()
-            print('speed increasing! ')
-        #sprint(len(self.aliens))
+            
+            # Increase the level
+            self.stats.level +=1
+            self.sb.prep_level()
         
         if collisions:
             number_aliens = [len(v) for v in collisions.values()]
             self.stats.score+=(self.settings.alien_points * number_aliens[0])
             self.sb.prep_score()
-            print(number_aliens)
+            self.sb.check_high_score()
    
     
     def _update_aliens(self):
